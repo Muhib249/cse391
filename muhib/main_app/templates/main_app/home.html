@@ -1,0 +1,76 @@
+
+{% extends 'main_app/base.html' %}
+
+{% block title %}Welcome - QR Attendance System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row py-5">
+        <div class="col-md-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">QR Attendance System</h1>
+            <p class="lead mb-4">
+                A modern solution for tracking attendance using QR codes. 
+                Simple, efficient, and reliable.
+            </p>
+            {% if not user.is_authenticated %}
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'main_app:login' %}" class="btn btn-primary btn-lg px-4 gap-3">Login</a>
+                    <a href="{% url 'main_app:register' %}" class="btn btn-outline-secondary btn-lg px-4">Register</a>
+                    <a href="{% url 'main_app:admin_login' %}" class="btn btn-danger btn-lg px-4">Admin</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row g-4 py-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">For Students</h3>
+                    <ul class="list-unstyled">
+                        <li>✓ Mark attendance via QR code</li>
+                        <li>✓ Track attendance percentage</li>
+                        <li>✓ View attendance history</li>
+                        <li>✓ Receive announcements</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">For Teachers</h3>
+                    <ul class="list-unstyled">
+                        <li>✓ Generate QR codes</li>
+                        <li>✓ Track student attendance</li>
+                        <li>✓ Make announcements</li>
+                        <li>✓ Generate reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">For Admin</h3>
+                    <ul class="list-unstyled">
+                        <li>✓ Manage users</li>
+                        <li>✓ Monitor system</li>
+                        <li>✓ Generate statistics</li>
+                        <li>✓ System configuration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="row py-5">
+        <div class="col text-center">
+            <p class="text-muted">© 2024 QR Attendance System. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

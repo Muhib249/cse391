@@ -1,0 +1,71 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+    {% if message %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+
+    <a href="/admin/main_app/course/add/" class="btn btn-primary mb-4">Add New Course</a>
+
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Courses</h3>
+            <ul class="list-group">
+                {% for course in courses %}
+                <li class="list-group-item">
+                    {{ course.name }} - {{ course.teacher }}
+                    <ul>
+                        <li>Students Enrolled:</li>
+                        <ul>
+                            {% for student in course.students.all %}
+                            <li>{{ student.user.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Assign Students or Teachers</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="course">Course</label>
+                    <select name="course" id="course" class="form-select">
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="teacher">Teacher</label>
+                    <select name="teacher" id="teacher" class="form-select">
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="student">Student</label>
+                    <select name="student" id="student" class="form-select">
+                        {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Assign</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

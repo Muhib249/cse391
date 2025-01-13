@@ -1,0 +1,147 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">Quick Actions</div>
+            <div class="card-body">
+                <button class="btn btn-primary mb-2 w-100" data-bs-toggle="modal" data-bs-target="#createSessionModal">
+                    Create Attendance Session
+                </button>
+                <button class="btn btn-secondary mb-2 w-100" data-bs-toggle="modal" data-bs-target="#announcementModal">
+                    Make Announcement
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Statistics</div>
+            <div class="card-body">
+                <p>Total Sessions: {{ sessions.count }}</p>
+                <p>Total Students: {{ total_students }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Recent Attendance Sessions</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Present</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session.date }}</td>
+                            <td>{{ session.course.name }}</td>
+                            <td>{{ session.attendancerecord_set.count }}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info">View Details</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No sessions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">Generated QR Code</div>
+            <div class="card-body text-center">
+                {% if qr_image_url %}
+                <img src="{{ qr_image_url }}" alt="QR Code for Attendance Session" class="img-fluid mb-3">
+                <p>Session ID: {{ session_id }}</p>
+                {% else %}
+                <p>No QR Code generated yet. Create an attendance session to generate one.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Create Session Modal -->
+<div class="modal fade" id="createSessionModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Attendance Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'main_app:create_attendance' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label>Course</label>
+                        <select class="form-control" name="course_id" required>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% empty %}
+                            <option value="">No courses assigned</option>
+                            {% endfor %}
+                        </select>
+                        
+                        
+                    </div>
+                    <div class="mb-3">
+                        <label>Latitude</label>
+                        <input type="text" name="latitude" class="form-control" placeholder="Enter latitude" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Longitude</label>
+                        <input type="text" name="longitude" class="form-control" placeholder="Enter longitude" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Radius (meters)</label>
+                        <input type="number" name="radius" class="form-control" value="50">
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary w-100">Create Session</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Make Announcement Modal -->
+<div class="modal fade" id="announcementModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Make Announcement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'main_app:make_announcement' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" class="form-control" placeholder="Enter title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content">Message</label>
+                        <textarea id="content" name="content" class="form-control" placeholder="Enter message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Send Announcement</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

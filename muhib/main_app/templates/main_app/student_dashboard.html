@@ -1,0 +1,89 @@
+{% extends 'main_app/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Scan QR Code</div>
+                <div class="card-body">
+                    <div id="reader"></div>
+                    <button id="startScanner" class="btn btn-primary mt-3">Start Scanner</button>
+                </div>
+            </div>
+        </div>
+        <!-- Announcements Section -->
+<div class="card mt-4">
+    <div class="card-header">Announcements</div>
+    <div class="card-body">
+        {% if announcements %}
+            <ul>
+                {% for announcement in announcements %}
+                    <li>
+                        <strong>{{ announcement.title }}</strong> - {{ announcement.created_at|date:"F j, Y, g:i a" }}
+                        <p>{{ announcement.content }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No announcements available.</p>
+        {% endif %}
+    </div>
+</div>
+
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Attendance History</div>
+                <div class="card-body">
+                    {% for record in attendance_records %}
+                        <div class="alert alert-success">
+                            {{ record.session.course.name }} - {{ record.timestamp }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+let html5QrcodeScanner;
+
+document.getElementById('startScanner').addEventListener('click', function() {
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+    }
+    
+    html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10 });
+    html5QrcodeScanner.render(onScanSuccess);
+});
+
+function onScanSuccess(qrData) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            fetch('{% url "main_app:mark_attendance" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    session_id: qrData.split(':')[0],
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Attendance marked successfully!');
+                    location.reload();
+                }
+            });
+        });
+    }
+}
+</script>
+{% endblock %}

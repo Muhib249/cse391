@@ -1,0 +1,60 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Scan QR Code Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Scan QR Code</div>
+                <div class="card-body">
+                    {% if qr_image_url %}
+                        <h5>Scan the QR Code Below:</h5>
+                        <img src="{{ qr_image_url }}" alt="QR Code for Attendance Session" class="img-fluid mb-3">
+                    {% else %}
+                        <p>No active sessions available at the moment.</p>
+                    {% endif %}
+                    
+                    <h5>Upload QR Code to Scan:</h5>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'main_app:mark_attendance' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="qr_code_image">Choose Image</label>
+                            <input type="file" id="qr_code_image" name="qr_code_image" class="form-control mb-3" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Attendance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance History Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Attendance History</div>
+                <div class="card-body">
+                    {% if attendance_records %}
+                        <ul>
+                            {% for record in attendance_records %}
+                                <li>
+                                    {{ record.timestamp }} - 
+                                    {{ record.session.course.name }} - 
+                                    {% if record.is_valid %}
+                                        <span class="text-success">Present</span>
+                                    {% else %}
+                                        <span class="text-danger">Invalid</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No attendance records available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
